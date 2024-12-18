@@ -92,6 +92,51 @@ const GeneratePhoto = () => {
     link.click(); // 클릭 이벤트 실행
   };
 
+  const generatePixelArt = () => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const img = new Image();
+    img.crossOrigin = "Anonymous"; // CORS 문제 방지
+    img.src = image;
+
+    img.onload = () => {
+      console.log("Image loaded for pixel art");
+
+      const scale = 0.1;
+      const width = img.width;
+      const height = img.height;
+
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+
+      // 축소 후 확대
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(
+        canvas,
+        0,
+        0,
+        canvas.width,
+        canvas.height,
+        0,
+        0,
+        width,
+        height
+      );
+
+      const pixelArtUrl = canvas.toDataURL("image/png");
+      console.log("Generated Pixel Art URL:", pixelArtUrl);
+
+      setImage(pixelArtUrl); // 픽셀화된 이미지 상태 업데이트
+      setImageName("pixel_art.png"); // 파일 이름 변경
+    };
+
+    img.onerror = () => {
+      console.error("Failed to load image");
+    };
+  };
+
   return (
     <Wrapper>
       <ImgBox>
@@ -125,7 +170,7 @@ const GeneratePhoto = () => {
         </Button>
       </ButtonsWrap>
       <GenerateWrap>
-        <button>Generate Your Photo</button>
+        <button onClick={generatePixelArt}>Generate Your Photo</button>
       </GenerateWrap>
     </Wrapper>
   );
