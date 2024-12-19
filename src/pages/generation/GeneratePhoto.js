@@ -38,7 +38,8 @@ const ImgBox = styled.div`
 `;
 
 const ButtonsWrap = styled.div`
-  width: 388px;
+  width: 338px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -87,9 +88,9 @@ const GeneratePhoto = () => {
     }
 
     const link = document.createElement("a");
-    link.href = image; // 이미지 URL
+    link.href = image;
     link.download = imageName; // 다운받을 파일이름(원본) 받아옴!
-    link.click(); // 클릭 이벤트 실행
+    link.click();
   };
 
   const generatePixelArt = () => {
@@ -215,17 +216,43 @@ const GeneratePhoto = () => {
     };
   };
 
-  const copyToClipboard = (url) => {
-    navigator.clipboard
-      .writeText(url)
-      .then(() => {
-        alert("이미지 URL이 클립보드에 복사되었습니다!");
-      })
-      .catch((err) => {
-        console.error("복사 실패:", err);
-        alert("복사에 실패했습니다.");
-      });
-  };
+  // const copyToClipboard = (url) => {
+  //   navigator.clipboard
+  //     .writeText(url)
+  //     .then(() => {
+  //       alert("이미지 URL이 클립보드에 복사되었습니다!");
+  //     })
+  //     .catch((err) => {
+  //       console.error("복사 실패:", err);
+  //       alert("복사에 실패했습니다.");
+  //     });
+  // };
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          alert("Copied to clipboard!");
+        })
+        .catch((err) => {
+          console.error("Failed to copy: ", err);
+        });
+    } else {
+      // Fallback for unsupported browsers
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        alert("Copied to clipboard!");
+      } catch (err) {
+        console.error("Fallback: Unable to copy", err);
+      }
+      document.body.removeChild(textarea);
+    }
+  }
 
   return (
     <Wrapper>
