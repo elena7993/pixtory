@@ -6,9 +6,11 @@ import styled from "styled-components";
 const Button = styled.button`
   all: unset;
   border: 1px solid #000;
-  border: ${(props) => (props.noBorder ? "none" : "1px solid #000")};
-  width: ${(props) => props.width || "100px"};
   height: 40px;
+  width: ${(props) => props.width || "100px"};
+  border: ${(props) => (props.noBorder ? "none" : "1px solid #fff")};
+  background-color: ${(props) => (props.noBg ? "none" : "#7fd1d8")};
+  color: ${(props) => (props.noColor ? "#000" : "#fff")};
   text-align: center;
   cursor: pointer;
   margin-bottom: 10px;
@@ -20,12 +22,13 @@ const Wrapper = styled.div`
   margin: 0 auto;
   font-family: "GalmuriMono9";
   padding: 20px;
+  background-color: #e2f4f6;
 `;
 
 const ImgBox = styled.div`
   width: 339px;
   height: 364px;
-  border: 5px solid #000;
+  border: 5px solid #004349;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -54,7 +57,8 @@ const GenerateWrap = styled.div`
     all: unset;
     width: 282px;
     height: 56px;
-    background-color: #000;
+    background-color: #29b1bd;
+    border: 1px solid #fff;
     color: #fff;
     text-align: center;
     cursor: pointer;
@@ -228,6 +232,8 @@ const GeneratePhoto = () => {
   //     });
   // };
 
+  // -----------------------------------------------------------
+
   function copyToClipboard(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard
@@ -258,7 +264,13 @@ const GeneratePhoto = () => {
     <Wrapper>
       <ImgBox>
         <label htmlFor="fileInput">
-          <Button width="162px" noBorder onClick={triggerFileInput}>
+          <Button
+            width="162px"
+            noBorder
+            noBg
+            noColor
+            onClick={triggerFileInput}
+          >
             Upload Image <AiOutlineUpload />
           </Button>
         </label>
@@ -280,7 +292,7 @@ const GeneratePhoto = () => {
       </ImgBox>
       <ButtonsWrap>
         <Button width="162px" onClick={handleDownload}>
-          Download Image <AiOutlineDownload />
+          Download Image <AiOutlineDownload sty />
         </Button>
         <Button width="102px" onClick={() => copyToClipboard(image)}>
           Copy <FaRegCopy />
