@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { AiOutlineDownload, AiOutlineUpload } from "react-icons/ai";
-import { MdOutlineShare } from "react-icons/md";
+import { FaRegCopy } from "react-icons/fa";
 import styled from "styled-components";
 
 const Button = styled.button`
@@ -215,6 +215,18 @@ const GeneratePhoto = () => {
     };
   };
 
+  const copyToClipboard = (url) => {
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        alert("이미지 URL이 클립보드에 복사되었습니다!");
+      })
+      .catch((err) => {
+        console.error("복사 실패:", err);
+        alert("복사에 실패했습니다.");
+      });
+  };
+
   return (
     <Wrapper>
       <ImgBox>
@@ -243,8 +255,8 @@ const GeneratePhoto = () => {
         <Button width="162px" onClick={handleDownload}>
           Download Image <AiOutlineDownload />
         </Button>
-        <Button width="102px">
-          Share <MdOutlineShare />
+        <Button width="102px" onClick={() => copyToClipboard(image)}>
+          Copy <FaRegCopy />
         </Button>
       </ButtonsWrap>
       <GenerateWrap>
