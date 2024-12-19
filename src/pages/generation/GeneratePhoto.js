@@ -103,21 +103,34 @@ const GeneratePhoto = () => {
     img.onload = () => {
       console.log("Image loaded for pixel art");
 
-      const scale = 0.05; // 픽셀화 정도 조정
+      const scale = 0.25; // 픽셀화 정도 조정
       const originalWidth = img.width;
       const originalHeight = img.height;
 
       // 1. 축소 캔버스 설정
       canvas.width = originalWidth * scale;
       canvas.height = originalHeight * scale;
-      ctx.imageSmoothingEnabled = false; // 픽셀화 효과 유지
+
+      ctx.imageSmoothingEnabled = false;
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      // 2. 확대 캔버스 설정
+      // 2. 색상 단순화
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imgData.data;
+
+      const simplifyColor = (value) => Math.round(value / 64) * 64; // 색상을 4단계로 단순화 (0, 64, 128, 192, 255)
+      for (let i = 0; i < data.length; i += 4) {
+        data[i] = simplifyColor(data[i]); // R
+        data[i + 1] = simplifyColor(data[i + 1]); // G
+        data[i + 2] = simplifyColor(data[i + 2]); // B
+      }
+      ctx.putImageData(imgData, 0, 0);
+
+      // 3. 확대 캔버스 설정
       const enlargedCanvas = document.createElement("canvas");
       const enlargedCtx = enlargedCanvas.getContext("2d");
-      enlargedCanvas.width = originalWidth;
-      enlargedCanvas.height = originalHeight;
+      enlargedCanvas.width = originalWidth * 0.9;
+      enlargedCanvas.height = originalHeight * 0.9;
 
       enlargedCtx.imageSmoothingEnabled = false;
       enlargedCtx.drawImage(
@@ -132,31 +145,69 @@ const GeneratePhoto = () => {
         enlargedCanvas.height
       );
 
-      // 3. NES 스타일 색상 팔레트 적용
-      const nesPalette = [
-        [0, 0, 0], // Black
-        [255, 255, 255], // White
-        [192, 192, 192], // Light Gray
-        [128, 128, 128], // Dark Gray
-        [255, 0, 0], // Red
-        [0, 255, 0], // Green
-        [0, 0, 255], // Blue
-        [255, 255, 0], // Yellow
-        [255, 128, 0], // Orange
-        [128, 0, 255], // Purple
-        [0, 255, 255], // Cyan
-        [255, 0, 255], // Magenta
-      ];
+      // 4. 경계선 추가
+      const addOutline = (canvas, outlineColor = [0, 0, 0]) => {
+        const ctx = canvas.getContext("2d");
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imgData.data;
 
-      // 확대된 캔버스에 NES 팔레트 적용
-      applyCustomPalette(enlargedCanvas, nesPalette);
+        const newImgData = ctx.createImageData(imgData);
+        const newData = newImgData.data;
 
-      // 4. Data URL 생성
+        const getPixel = (x, y) => {
+          if (x < 0 || y < 0 || x >= canvas.width || y >= canvas.height) {
+            return null;
+          }
+          const index = (y * canvas.width + x) * 4;
+          return [
+            data[index],
+            data[index + 1],
+            data[index + 2],
+            data[index + 3],
+          ];
+        };
+
+        const isTransparent = (pixel) => pixel && pixel[3] === 0;
+
+        for (let y = 0; y < canvas.height; y++) {
+          for (let x = 0; x < canvas.width; x++) {
+            const index = (y * canvas.width + x) * 4;
+            const pixel = getPixel(x, y);
+
+            if (!pixel || isTransparent(pixel)) continue;
+
+            const neighbors = [
+              getPixel(x - 1, y), // 왼쪽
+              getPixel(x + 1, y), // 오른쪽
+              getPixel(x, y - 1), // 위
+              getPixel(x, y + 1), // 아래
+            ];
+
+            if (neighbors.some(isTransparent)) {
+              newData[index] = outlineColor[0];
+              newData[index + 1] = outlineColor[1];
+              newData[index + 2] = outlineColor[2];
+              newData[index + 3] = 255;
+            } else {
+              newData[index] = data[index];
+              newData[index + 1] = data[index + 1];
+              newData[index + 2] = data[index + 2];
+              newData[index + 3] = data[index + 3];
+            }
+          }
+        }
+
+        ctx.putImageData(newImgData, 0, 0);
+      };
+
+      addOutline(enlargedCanvas);
+
+      // 5. Data URL 생성
       const pixelArtUrl = enlargedCanvas.toDataURL("image/png");
       console.log("Generated Pixel Art URL:", pixelArtUrl);
 
-      setImage(pixelArtUrl); // 상태 업데이트
-      setImageName("pixel_art.png"); // 다운로드를 위한 파일 이름 설정
+      setImage(pixelArtUrl);
+      setImageName("pixel_art_with_improvements.png");
     };
 
     img.onerror = () => {
@@ -164,39 +215,6 @@ const GeneratePhoto = () => {
     };
   };
 
-  const applyCustomPalette = (canvas, palette) => {
-    const ctx = canvas.getContext("2d");
-    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imgData.data;
-
-    const findClosestColor = (r, g, b) => {
-      let closestColor = palette[0];
-      let closestDistance = Infinity;
-
-      palette.forEach(([pr, pg, pb]) => {
-        const distance = Math.sqrt(
-          (r - pr) ** 2 + (g - pg) ** 2 + (b - pb) ** 2
-        );
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestColor = [pr, pg, pb];
-        }
-      });
-
-      return closestColor;
-    };
-
-    for (let i = 0; i < data.length; i += 4) {
-      const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
-      const [pr, pg, pb] = findClosestColor(r, g, b);
-
-      data[i] = pr;
-      data[i + 1] = pg;
-      data[i + 2] = pb;
-    }
-
-    ctx.putImageData(imgData, 0, 0);
-  };
   return (
     <Wrapper>
       <ImgBox>
