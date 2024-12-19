@@ -103,17 +103,24 @@ const GeneratePhoto = () => {
     img.onload = () => {
       console.log("Image loaded for pixel art");
 
-      const scale = 0.1;
-      const width = img.width;
-      const height = img.height;
+      const scale = 0.05; // 픽셀화 정도 조정
+      const originalWidth = img.width;
+      const originalHeight = img.height;
 
-      canvas.width = width * scale;
-      canvas.height = height * scale;
-
-      // 축소 후 확대
+      // 1. 축소 캔버스 설정
+      canvas.width = originalWidth * scale;
+      canvas.height = originalHeight * scale;
+      ctx.imageSmoothingEnabled = false; // 픽셀화 효과 유지
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(
+
+      // 2. 확대 캔버스 설정
+      const enlargedCanvas = document.createElement("canvas");
+      const enlargedCtx = enlargedCanvas.getContext("2d");
+      enlargedCanvas.width = originalWidth;
+      enlargedCanvas.height = originalHeight;
+
+      enlargedCtx.imageSmoothingEnabled = false;
+      enlargedCtx.drawImage(
         canvas,
         0,
         0,
@@ -121,15 +128,35 @@ const GeneratePhoto = () => {
         canvas.height,
         0,
         0,
-        width,
-        height
+        enlargedCanvas.width,
+        enlargedCanvas.height
       );
 
-      const pixelArtUrl = canvas.toDataURL("image/png");
+      // 3. NES 스타일 색상 팔레트 적용
+      const nesPalette = [
+        [0, 0, 0], // Black
+        [255, 255, 255], // White
+        [192, 192, 192], // Light Gray
+        [128, 128, 128], // Dark Gray
+        [255, 0, 0], // Red
+        [0, 255, 0], // Green
+        [0, 0, 255], // Blue
+        [255, 255, 0], // Yellow
+        [255, 128, 0], // Orange
+        [128, 0, 255], // Purple
+        [0, 255, 255], // Cyan
+        [255, 0, 255], // Magenta
+      ];
+
+      // 확대된 캔버스에 NES 팔레트 적용
+      applyCustomPalette(enlargedCanvas, nesPalette);
+
+      // 4. Data URL 생성
+      const pixelArtUrl = enlargedCanvas.toDataURL("image/png");
       console.log("Generated Pixel Art URL:", pixelArtUrl);
 
-      setImage(pixelArtUrl); // 픽셀화된 이미지 상태 업데이트
-      setImageName("pixel_art.png"); // 파일 이름 변경
+      setImage(pixelArtUrl); // 상태 업데이트
+      setImageName("pixel_art.png"); // 다운로드를 위한 파일 이름 설정
     };
 
     img.onerror = () => {
@@ -137,6 +164,39 @@ const GeneratePhoto = () => {
     };
   };
 
+  const applyCustomPalette = (canvas, palette) => {
+    const ctx = canvas.getContext("2d");
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imgData.data;
+
+    const findClosestColor = (r, g, b) => {
+      let closestColor = palette[0];
+      let closestDistance = Infinity;
+
+      palette.forEach(([pr, pg, pb]) => {
+        const distance = Math.sqrt(
+          (r - pr) ** 2 + (g - pg) ** 2 + (b - pb) ** 2
+        );
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestColor = [pr, pg, pb];
+        }
+      });
+
+      return closestColor;
+    };
+
+    for (let i = 0; i < data.length; i += 4) {
+      const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
+      const [pr, pg, pb] = findClosestColor(r, g, b);
+
+      data[i] = pr;
+      data[i + 1] = pg;
+      data[i + 2] = pb;
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+  };
   return (
     <Wrapper>
       <ImgBox>
