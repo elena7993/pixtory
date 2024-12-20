@@ -19,6 +19,8 @@ const Button = styled.button`
 const Wrapper = styled.div`
   width: 100%;
   max-width: 430px;
+  height: 100vh;
+  min-height: 100vh;
   margin: 0 auto;
   font-family: "GalmuriMono9";
   padding: 20px;
@@ -36,7 +38,7 @@ const ImgBox = styled.div`
   margin: 0 auto 20px;
   img {
     width: 91px;
-    height: 91px;
+    height: 78px;
   }
 `;
 
@@ -260,6 +262,31 @@ const GeneratePhoto = () => {
     }
   }
 
+  const detectDevice = () => {
+    const userAgent = navigator.userAgent;
+    if (/android/i.test(userAgent)) {
+      return "android";
+    } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
+      return "ios";
+    } else {
+      return "web";
+    }
+  };
+  // console.log(detectDevice());
+  // console.log(navigator.userAgent);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const copyButton = document.querySelector(".copyButton");
+    const deviceType = detectDevice();
+    if (copyButton) {
+      if (deviceType === "android") {
+        copyButton.style.display = "none";
+      } else {
+        copyButton.style.display = "block";
+      }
+    }
+  });
+
   return (
     <Wrapper>
       <ImgBox>
@@ -285,7 +312,7 @@ const GeneratePhoto = () => {
           <img src={image} alt="uploaded_img" />
         ) : (
           <img
-            src={`${process.env.PUBLIC_URL}/imgs/pixelart_campervan.jpg`}
+            src={`${process.env.PUBLIC_URL}/imgs/pixelart_campervan.png`}
             alt="default_img"
           />
         )}
@@ -294,7 +321,11 @@ const GeneratePhoto = () => {
         <Button width="162px" onClick={handleDownload}>
           Download Image <AiOutlineDownload sty />
         </Button>
-        <Button width="102px" onClick={() => copyToClipboard(image)}>
+        <Button
+          className="copyButton"
+          width="102px"
+          onClick={() => copyToClipboard(image)}
+        >
           Copy <FaRegCopy />
         </Button>
       </ButtonsWrap>
