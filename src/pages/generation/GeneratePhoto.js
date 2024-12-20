@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { toaster } from "evergreen-ui";
+import { useEffect, useRef, useState } from "react";
 import { AiOutlineDownload, AiOutlineUpload } from "react-icons/ai";
 import { FaRegCopy } from "react-icons/fa";
 import styled from "styled-components";
@@ -89,8 +90,10 @@ const GeneratePhoto = () => {
 
   const handleDownload = () => {
     if (!image) {
-      alert("다운로드할 이미지가 없습니다!");
+      toaster.warning("다운로드할 이미지가 없습니다!");
       return;
+    } else {
+      toaster.success("이미지가 다운로드 되었습니다.");
     }
 
     const link = document.createElement("a");
@@ -107,10 +110,15 @@ const GeneratePhoto = () => {
     img.crossOrigin = "Anonymous"; // CORS 문제 방지
     img.src = image;
 
-    img.onload = () => {
-      console.log("Image loaded for pixel art");
+    toaster.success("이미지가 픽셀아트로 변환되었습니다!", {
+      duration: 10,
+      // autoClose: 5000,
+    });
 
-      const scale = 0.25; // 픽셀화 정도 조정
+    img.onload = () => {
+      // console.log("Image loaded for pixel art");
+
+      const scale = 0.25; // 픽셀화 정도 조정(0.1 no)
       const originalWidth = img.width;
       const originalHeight = img.height;
 
@@ -241,7 +249,7 @@ const GeneratePhoto = () => {
       navigator.clipboard
         .writeText(text)
         .then(() => {
-          alert("Copied to clipboard!");
+          toaster.success("이미지 주소가 복사되었습니다!");
         })
         .catch((err) => {
           console.error("Failed to copy: ", err);
@@ -262,30 +270,24 @@ const GeneratePhoto = () => {
     }
   }
 
-  const detectDevice = () => {
-    const userAgent = navigator.userAgent;
-    if (/android/i.test(userAgent)) {
-      return "android";
-    } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
-      return "ios";
-    } else {
-      return "web";
-    }
-  };
-  // console.log(detectDevice());
-  // console.log(navigator.userAgent);
+  const [deviceType, setDeviceType] = useState("web");
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const copyButton = document.querySelector(".copyButton");
-    const deviceType = detectDevice();
-    if (copyButton) {
-      if (deviceType === "android") {
-        copyButton.style.display = "none";
+  useEffect(() => {
+    const detectDevice = () => {
+      const userAgent = navigator.userAgent;
+      if (/android/i.test(userAgent)) {
+        return "android";
+      } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
+        return "ios";
       } else {
-        copyButton.style.display = "block";
+        return "web";
       }
-    }
-  });
+    };
+
+    const detectType = detectDevice();
+    setDeviceType(detectType);
+    console.log(detectType);
+  }, []);
 
   return (
     <Wrapper>
@@ -321,13 +323,15 @@ const GeneratePhoto = () => {
         <Button width="162px" onClick={handleDownload}>
           Download Image <AiOutlineDownload sty />
         </Button>
-        <Button
-          className="copyButton"
-          width="102px"
-          onClick={() => copyToClipboard(image)}
-        >
-          Copy <FaRegCopy />
-        </Button>
+        {deviceType !== "android" && (
+          <Button
+            className="copyButton"
+            width="102px"
+            onClick={() => copyToClipboard(image)}
+          >
+            Copy <FaRegCopy />
+          </Button>
+        )}
       </ButtonsWrap>
       <GenerateWrap>
         <button onClick={generatePixelArt}>Generate Your Photo</button>
