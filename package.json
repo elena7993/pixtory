@@ -23,7 +23,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "homepage": "https://elena7993.github.io.pixtory/#/",
+  "homepage": "https://elena7993.github.io/pixtory/#/",
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -43,6 +43,7 @@
     ]
   },
   "devDependencies": {
-    "gh": "^2.8.9"
+    "gh": "^2.8.9",
+    "gh-pages": "^6.2.0"
   }
 }
