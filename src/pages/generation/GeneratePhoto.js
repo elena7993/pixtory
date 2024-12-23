@@ -4,7 +4,9 @@ import { AiOutlineDownload, AiOutlineUpload } from "react-icons/ai";
 import { FaRegCopy } from "react-icons/fa";
 import styled from "styled-components";
 
-const Button = styled.button`
+const Button = styled("button").withConfig({
+  shouldForwardProp: (prop) => !["noBorder", "noBg", "noColor"].includes(prop),
+})`
   all: unset;
   border: 1px solid #000;
   height: 40px;
@@ -71,6 +73,7 @@ const GenerateWrap = styled.div`
 const GeneratePhoto = () => {
   const [image, setImage] = useState(null);
   const [imageName, setImageName] = useState("downloaded_image.png");
+  const [deviceType, setDeviceType] = useState("web");
   const fileInputRef = useRef(null);
 
   const triggerFileInput = () => {
@@ -91,9 +94,9 @@ const GeneratePhoto = () => {
   const handleDownload = () => {
     if (!image) {
       toaster.warning("다운로드할 이미지가 없습니다!");
-      return;
+      // return;
     } else {
-      toaster.success("이미지가 다운로드 되었습니다.");
+      toaster.success("이미지가 다운로드 완료었습니다.");
     }
 
     const link = document.createElement("a");
@@ -110,10 +113,14 @@ const GeneratePhoto = () => {
     img.crossOrigin = "Anonymous"; // CORS 문제 방지
     img.src = image;
 
-    toaster.success("이미지가 픽셀아트로 변환되었습니다!", {
-      duration: 10,
-      // autoClose: 5000,
-    });
+    console.log(img);
+
+    if (!image) {
+      console.log(12);
+      toaster.warning("업로드된 이미지가 없습니다. 이미지를 업로드해주세요!");
+    } else {
+      toaster.success("이미지가 픽셀아트로 변환되었습니다.");
+    }
 
     img.onload = () => {
       // console.log("Image loaded for pixel art");
@@ -224,32 +231,21 @@ const GeneratePhoto = () => {
       setImage(pixelArtUrl);
       setImageName("pixel_art_with_improvements.png");
     };
-
-    img.onerror = () => {
-      console.error("Failed to load image");
-    };
   };
-
-  // const copyToClipboard = (url) => {
-  //   navigator.clipboard
-  //     .writeText(url)
-  //     .then(() => {
-  //       alert("이미지 URL이 클립보드에 복사되었습니다!");
-  //     })
-  //     .catch((err) => {
-  //       console.error("복사 실패:", err);
-  //       alert("복사에 실패했습니다.");
-  //     });
+  // const generatePixelArt = () => {
+  //   console.log(image);
   // };
-
-  // -----------------------------------------------------------
-
   function copyToClipboard(text) {
+    if (!text) {
+      toaster.warning("복사할 이미지가 없습니다. 이미지를 업로드해주세요! ");
+      return;
+    }
+
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard
         .writeText(text)
         .then(() => {
-          toaster.success("이미지 주소가 복사되었습니다!");
+          toaster.success("이미지 주소가 복사되었습니다.");
         })
         .catch((err) => {
           console.error("Failed to copy: ", err);
@@ -262,15 +258,13 @@ const GeneratePhoto = () => {
       textarea.select();
       try {
         document.execCommand("copy");
-        alert("Copied to clipboard!");
+        // alert("Copied to clipboard!");
       } catch (err) {
         console.error("Fallback: Unable to copy", err);
       }
       document.body.removeChild(textarea);
     }
   }
-
-  const [deviceType, setDeviceType] = useState("web");
 
   useEffect(() => {
     const detectDevice = () => {
@@ -286,8 +280,9 @@ const GeneratePhoto = () => {
 
     const detectType = detectDevice();
     setDeviceType(detectType);
-    console.log(detectType);
-  }, []);
+    // console.log(detectType);
+    console.log("^^");
+  }, [image]);
 
   return (
     <Wrapper>
@@ -320,13 +315,13 @@ const GeneratePhoto = () => {
         )}
       </ImgBox>
       <ButtonsWrap>
-        <Button width="162px" onClick={handleDownload}>
-          Download Image <AiOutlineDownload sty />
+        <Button style={{ width: "162px" }} onClick={handleDownload}>
+          Download Image <AiOutlineDownload />
         </Button>
         {deviceType !== "android" && (
           <Button
+            style={{ width: "102px" }}
             className="copyButton"
-            width="102px"
             onClick={() => copyToClipboard(image)}
           >
             Copy <FaRegCopy />

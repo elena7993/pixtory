@@ -54,7 +54,7 @@ const Home = () => {
           <div className="title">Pixtory</div>
           <div className="desc">
             소중한 인연, 아름다운 추억을 <br />
-            나만의 픽셀아트로 만들어 보세요!
+            나만의 레트로 아트로 만들어 보세요!
           </div>
         </div>
         <Button onClick={() => navigate("main")}>시작하기</Button>
