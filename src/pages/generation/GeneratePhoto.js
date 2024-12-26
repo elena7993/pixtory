@@ -31,9 +31,10 @@ const Wrapper = styled.div`
 `;
 
 const ImgBox = styled.div`
-  width: 339px;
+  box-sizing: border-box;
+  width: 348px;
   height: 364px;
-  border: 5px solid #004349;
+  border: 5px solid #29b1bd;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -46,27 +47,32 @@ const ImgBox = styled.div`
 `;
 
 const ButtonsWrap = styled.div`
-  width: 338px;
+  width: 348px;
   margin: 0 auto;
+  padding: 40px 0;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const GenerateWrap = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 36px;
 
   button {
     all: unset;
-    width: 282px;
+    width: 348px;
     height: 56px;
     background-color: #29b1bd;
     border: 1px solid #fff;
     color: #fff;
     text-align: center;
     cursor: pointer;
+  }
+`;
+
+const TipBox = styled.div`
+  p {
   }
 `;
 
@@ -232,9 +238,7 @@ const GeneratePhoto = () => {
       setImageName("pixel_art_with_improvements.png");
     };
   };
-  // const generatePixelArt = () => {
-  //   console.log(image);
-  // };
+
   function copyToClipboard(text) {
     if (!text) {
       toaster.warning("복사할 이미지가 없습니다. 이미지를 업로드해주세요! ");
@@ -258,7 +262,6 @@ const GeneratePhoto = () => {
       textarea.select();
       try {
         document.execCommand("copy");
-        // alert("Copied to clipboard!");
       } catch (err) {
         console.error("Fallback: Unable to copy", err);
       }
@@ -281,7 +284,7 @@ const GeneratePhoto = () => {
     const detectType = detectDevice();
     setDeviceType(detectType);
     // console.log(detectType);
-    console.log("^^");
+    // console.log("^^");
   }, [image]);
 
   return (
@@ -314,6 +317,9 @@ const GeneratePhoto = () => {
           />
         )}
       </ImgBox>
+      <GenerateWrap>
+        <button onClick={generatePixelArt}>Generate Your Photo</button>
+      </GenerateWrap>
       <ButtonsWrap>
         <Button style={{ width: "162px" }} onClick={handleDownload}>
           Download Image <AiOutlineDownload />
@@ -328,9 +334,13 @@ const GeneratePhoto = () => {
           </Button>
         )}
       </ButtonsWrap>
-      <GenerateWrap>
-        <button onClick={generatePixelArt}>Generate Your Photo</button>
-      </GenerateWrap>
+      <TipBox>
+        <h3>
+          <span></span>Tip
+        </h3>
+        <p>실사 이미지는 더욱 레트로스럽게 변환됩니다!</p>
+        <p>로고, 아이콘 등은 픽셀아트에 가깝게 변환됩니다!</p>
+      </TipBox>
     </Wrapper>
   );
 };
