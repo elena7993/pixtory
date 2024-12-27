@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/pixtory/static/js/main.63fd3236.js",
+    "main.js": "/pixtory/static/js/main.bdb90c3a.js",
     "index.html": "/pixtory/index.html",
-    "main.63fd3236.js.map": "/pixtory/static/js/main.63fd3236.js.map"
+    "main.bdb90c3a.js.map": "/pixtory/static/js/main.bdb90c3a.js.map"
   },
   "entrypoints": [
-    "static/js/main.63fd3236.js"
+    "static/js/main.bdb90c3a.js"
   ]
 }
