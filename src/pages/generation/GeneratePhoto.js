@@ -6,7 +6,8 @@ import styled from "styled-components";
 import PageTitle from "../../PageTitle";
 
 const Button = styled("button").withConfig({
-  shouldForwardProp: (prop) => !["noBorder", "noBg", "noColor"].includes(prop),
+  shouldForwardProp: (prop) =>
+    !["noBorder", "noBg", "noColor", "isUpload"].includes(prop),
 })`
   all: unset;
   border: 1px solid #000;
@@ -18,6 +19,7 @@ const Button = styled("button").withConfig({
   text-align: center;
   cursor: pointer;
   margin-bottom: 10px;
+  display: ${(props) => (props.isUpload ? "none" : "block")};
 `;
 
 const Wrapper = styled.div`
@@ -44,8 +46,11 @@ const ImgBox = styled.div`
   margin: 0 auto 20px;
   cursor: pointer;
   img {
-    width: 91px;
-    height: 78px;
+    /* width: 91px;
+    height: 78px; */
+    width: ${(props) => (props.isUpload ? "100%" : "91px")};
+    height: ${(props) => (props.isUpload ? "100%" : "78px")};
+    transition: all 0.2s ease-in-out;
   }
 `;
 
@@ -306,9 +311,9 @@ const GeneratePhoto = () => {
       <PageTitle title={"GENERATE"} />
 
       <Wrapper>
-        <ImgBox onClick={triggerFileInput}>
+        <ImgBox onClick={triggerFileInput} isUpload={!!image}>
           <label htmlFor="fileInput">
-            <Button width="162px" noBorder noBg noColor>
+            <Button width="162px" noBorder noBg noColor isUpload={!!image}>
               Upload Image <AiOutlineUpload />
             </Button>
           </label>
