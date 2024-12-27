@@ -1,8 +1,9 @@
 import { toaster } from "evergreen-ui";
 import { useEffect, useRef, useState } from "react";
 import { AiOutlineDownload, AiOutlineUpload } from "react-icons/ai";
-import { FaRegCopy } from "react-icons/fa";
+import { FaRegCopy, FaStarOfLife } from "react-icons/fa";
 import styled from "styled-components";
+import PageTitle from "../../PageTitle";
 
 const Button = styled("button").withConfig({
   shouldForwardProp: (prop) => !["noBorder", "noBg", "noColor"].includes(prop),
@@ -26,13 +27,14 @@ const Wrapper = styled.div`
   min-height: 100vh;
   margin: 0 auto;
   font-family: "GalmuriMono9";
-  padding: 20px;
+  padding: 20px 0;
   background-color: #e2f4f6;
+  box-sizing: border-box;
 `;
 
 const ImgBox = styled.div`
-  box-sizing: border-box;
-  width: 348px;
+  width: 100%;
+  max-width: 348px;
   height: 364px;
   border: 5px solid #29b1bd;
   display: flex;
@@ -40,6 +42,7 @@ const ImgBox = styled.div`
   justify-content: center;
   align-items: center;
   margin: 0 auto 20px;
+  cursor: pointer;
   img {
     width: 91px;
     height: 78px;
@@ -49,7 +52,7 @@ const ImgBox = styled.div`
 const ButtonsWrap = styled.div`
   width: 348px;
   margin: 0 auto;
-  padding: 40px 0;
+  padding: 20px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -72,7 +75,18 @@ const GenerateWrap = styled.div`
 `;
 
 const TipBox = styled.div`
+  width: 100%;
+  max-width: 348px;
+  margin: 0 auto;
+  line-height: 1.2;
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 15px 0 10px;
+  }
   p {
+    font-size: 16px;
+    margin: 10px 0;
   }
 `;
 
@@ -288,60 +302,58 @@ const GeneratePhoto = () => {
   }, [image]);
 
   return (
-    <Wrapper>
-      <ImgBox>
-        <label htmlFor="fileInput">
-          <Button
-            width="162px"
-            noBorder
-            noBg
-            noColor
-            onClick={triggerFileInput}
-          >
-            Upload Image <AiOutlineUpload />
-          </Button>
-        </label>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          style={{ display: "none" }}
-          onChange={handleUpload}
-        />
-        {image ? (
-          <img src={image} alt="uploaded_img" />
-        ) : (
-          <img
-            src={`${process.env.PUBLIC_URL}/imgs/pixelart_campervan.png`}
-            alt="default_img"
+    <>
+      <PageTitle title={"GENERATE"} />
+
+      <Wrapper>
+        <ImgBox onClick={triggerFileInput}>
+          <label htmlFor="fileInput">
+            <Button width="162px" noBorder noBg noColor>
+              Upload Image <AiOutlineUpload />
+            </Button>
+          </label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handleUpload}
           />
-        )}
-      </ImgBox>
-      <GenerateWrap>
-        <button onClick={generatePixelArt}>Generate Your Photo</button>
-      </GenerateWrap>
-      <ButtonsWrap>
-        <Button style={{ width: "162px" }} onClick={handleDownload}>
-          Download Image <AiOutlineDownload />
-        </Button>
-        {deviceType !== "android" && (
-          <Button
-            style={{ width: "102px" }}
-            className="copyButton"
-            onClick={() => copyToClipboard(image)}
-          >
-            Copy <FaRegCopy />
+          {image ? (
+            <img src={image} alt="uploaded_img" />
+          ) : (
+            <img
+              src={`${process.env.PUBLIC_URL}/imgs/pixelart_campervan.png`}
+              alt="default_img"
+            />
+          )}
+        </ImgBox>
+        <GenerateWrap>
+          <button onClick={generatePixelArt}>Generate Your Photo</button>
+        </GenerateWrap>
+        <ButtonsWrap>
+          <Button style={{ width: "162px" }} onClick={handleDownload}>
+            Download Image <AiOutlineDownload />
           </Button>
-        )}
-      </ButtonsWrap>
-      <TipBox>
-        <h3>
-          <span></span>Tip
-        </h3>
-        <p>실사 이미지는 더욱 레트로스럽게 변환됩니다!</p>
-        <p>로고, 아이콘 등은 픽셀아트에 가깝게 변환됩니다!</p>
-      </TipBox>
-    </Wrapper>
+          {deviceType !== "android" && (
+            <Button
+              style={{ width: "102px" }}
+              className="copyButton"
+              onClick={() => copyToClipboard(image)}
+            >
+              Copy <FaRegCopy />
+            </Button>
+          )}
+        </ButtonsWrap>
+        <TipBox>
+          <h3>
+            <FaStarOfLife style={{ fontSize: "14px" }} /> Tip{" "}
+          </h3>
+          <p>실사 이미지는 더욱 레트로스럽게 변환됩니다!</p>
+          <p>로고, 아이콘 등은 픽셀아트와 가깝게 변환됩니다!</p>
+        </TipBox>
+      </Wrapper>
+    </>
   );
 };
 

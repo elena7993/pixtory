@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import PageTitle from "../../PageTitle";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -8,7 +9,6 @@ const Wrapper = styled.div`
   margin: 0 auto;
   background: url(${`${process.env.PUBLIC_URL}/imgs/pixelart_Bg.jpg`}) no-repeat
     center/ cover;
-  /* filter: saturate(0.8); */
 `;
 const InnerWrap = styled.div`
   width: 100%;
@@ -48,18 +48,21 @@ const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <Wrapper>
-      <InnerWrap>
-        <div className="textBox">
-          <div className="title">Pixtory</div>
-          <div className="desc">
-            소중한 인연, 아름다운 추억을 <br />
-            나만의 레트로 아트로 만들어 보세요!
+    <>
+      <PageTitle title={"HOME"} />
+      <Wrapper>
+        <InnerWrap>
+          <div className="textBox">
+            <div className="title">Pixtory</div>
+            <div className="desc">
+              소중한 인연, 아름다운 추억을 <br />
+              나만의 레트로 아트로 만들어 보세요!
+            </div>
           </div>
-        </div>
-        <Button onClick={() => navigate("main")}>시작하기</Button>
-      </InnerWrap>
-    </Wrapper>
+          <Button onClick={() => navigate("main")}>시작하기</Button>
+        </InnerWrap>
+      </Wrapper>
+    </>
   );
 };
 
