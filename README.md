@@ -25,7 +25,7 @@
 
 ### 4. 스택
 
-- HTML/CSS, JS, React, Canvas, Node.js
+- HTML/CSS, React, Canvas, Node.js
 
 ### 5. 개발 스케쥴
 
